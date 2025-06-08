@@ -1,1 +1,216 @@
-# React.js-Technical-Questions
+# 📘 React Interview Questions & Answers Cheat Sheet
+
+---
+
+## 1. Component Lifecycle & Hooks
+
+### 🔹 What are the phases of a React component's lifecycle?
+- **Mounting**, **Updating**, and **Unmounting**
+
+### 🔹 How does `useEffect` mimic lifecycle methods?
+```js
+useEffect(() => {}, []) // componentDidMount  
+useEffect(() => {}, [dep]) // componentDidUpdate  
+useEffect(() => { return () => {}; }, []) // componentWillUnmount  
+```
+
+### 🔹 What happens if dependencies are missing in `useEffect`?
+- React may skip re-renders or use stale variables. Always include all external dependencies.
+
+### 🔹 How to perform cleanup in `useEffect`?
+```js
+useEffect(() => {
+  const timer = setTimeout(...);
+  return () => clearTimeout(timer);
+}, []);
+```
+
+### 🔹 Difference between `componentDidMount` and `useEffect(() => {}, [])`?
+- Both run after mount, but `useEffect` runs after the paint.
+
+### 🔹 Why is `componentWillMount` deprecated?
+- It caused bugs with async rendering and is no longer safe to use.
+
+### 🔹 When to use `useLayoutEffect`?
+- Use when you need DOM measurements **before paint** (e.g., reading element dimensions).
+
+---
+
+## 2. Performance Optimization
+
+### 🔹 What is `React.memo`?
+- HOC to prevent unnecessary re-renders if props haven’t changed.
+
+### 🔹 What is `useMemo()`?
+- Memoizes the result of a computation.
+```js
+const result = useMemo(() => computeExpensiveValue(input), [input]);
+```
+
+### 🔹 What is `useCallback()`?
+- Memoizes a function to avoid re-creation on re-renders.
+```js
+const handleClick = useCallback(() => doSomething(), [dependencies]);
+```
+
+### 🔹 How does React reconciliation work?
+- React compares new and old virtual DOM using keys to update only changed elements.
+
+### 🔹 Controlled vs Uncontrolled Components
+- **Controlled**: React state manages input values.  
+- **Uncontrolled**: DOM handles input values via `ref`.
+
+### 🔹 How to prevent unnecessary re-renders?
+- Use `React.memo`, `useCallback`, `useMemo`, and avoid anonymous functions in JSX.
+
+---
+
+## 3. State Management
+
+### 🔹 `useState` vs `useReducer`
+- `useState` is for simple state.
+- `useReducer` is better for complex or related states.
+
+### 🔹 Manage global state without Redux?
+- Use **Context API** + `useReducer` or libraries like **Zustand**, **Jotai**, etc.
+
+### 🔹 Pros and cons of Context API?
+- ✅ Simple, no extra lib  
+- ❌ Can cause performance issues with frequent updates
+
+### 🔹 What is state lifting?
+- Moving shared state up to a common ancestor to coordinate between components.
+
+### 🔹 Nested form state structure?
+```js
+const [formData, setFormData] = useState({ user: { name: '', email: '' } });
+```
+
+---
+
+## 4. Advanced React
+
+### 🔹 What is a Higher-Order Component (HOC)?
+```js
+const Enhanced = withLogger(MyComponent);
+```
+
+### 🔹 What is a custom hook?
+```js
+function useCounter() {
+  const [count, setCount] = useState(0);
+  return { count, increment: () => setCount(c => c + 1) };
+}
+```
+
+### 🔹 What are Portals?
+```js
+ReactDOM.createPortal(child, container);
+```
+
+### 🔹 What is render props?
+```js
+<DataProvider render={data => <Chart data={data} />} />
+```
+
+### 🔹 Server-side rendering (SSR)?
+- HTML is rendered on the server and sent to client before React takes over.
+
+### 🔹 Lazy loading and code splitting?
+```js
+const LazyComp = React.lazy(() => import('./MyComponent'));
+```
+
+### 🔹 Concurrent Mode?
+- React can pause and resume rendering, improving responsiveness.
+
+---
+
+## 5. React with Tools
+
+### 🔹 Fetching APIs
+```js
+useEffect(() => {
+  fetch('/api/data')
+    .then(res => res.json())
+    .then(setData);
+}, []);
+```
+
+### 🔹 Form Handling and Validation
+- Use controlled components, `Formik`, `React Hook Form`, or validation libs like `Yup`.
+
+### 🔹 Testing React Apps
+- Use **Jest** for unit testing, **React Testing Library** for integration/UI.
+
+### 🔹 Protected routes
+```js
+<Route path="/dashboard" element={auth ? <Dashboard /> : <Navigate to="/login" />} />
+```
+
+### 🔹 Error Boundaries
+```js
+class ErrorBoundary extends React.Component {
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    return this.state.hasError ? <Fallback /> : this.props.children;
+  }
+}
+```
+
+---
+
+## 6. Security & Best Practices
+
+### 🔹 Common security issues?
+- XSS via `dangerouslySetInnerHTML`. Always sanitize inputs.
+
+### 🔹 Ensuring accessibility (a11y)?
+- Use semantic HTML, ARIA roles, and test with screen readers.
+
+### 🔹 Importance of keys in lists?
+- Helps React identify what has changed. Use **unique, stable** keys.
+
+---
+
+## 7. Lifecycle Table: Class vs Hook
+
+| Lifecycle Method         | Hook Equivalent                         |
+|--------------------------|------------------------------------------|
+| `componentDidMount`      | `useEffect(() => {...}, [])`             |
+| `componentDidUpdate`     | `useEffect(() => {...}, [deps])`         |
+| `componentWillUnmount`   | `useEffect(() => { return () => {...}; }, [])` |
+
+---
+
+## 8. Difference Between Class and Functional Components
+
+| Feature | Class Component | Functional Component |
+|--------|------------------|----------------------|
+| Syntax | Uses `class` | Uses plain function |
+| State | `this.state` | `useState()` hook |
+| Lifecycle | Uses lifecycle methods | Uses `useEffect()` |
+| `this` keyword | Required | Not required |
+| Hooks support | ❌ | ✅ |
+| Code | More verbose | Cleaner, concise |
+| Performance | Slightly heavier | Lighter, faster |
+| Best For | Legacy projects | Modern React apps |
+
+### 🔹 Class Example
+```js
+class Counter extends React.Component {
+  state = { count: 0 };
+  increment = () => this.setState({ count: this.state.count + 1 });
+  render() {
+    return <button onClick={this.increment}>{this.state.count}</button>;
+  }
+}
+```
+
+### 🔹 Functional Example
+```js
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
