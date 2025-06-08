@@ -214,3 +214,96 @@ function Counter() {
   return <button onClick={() => setCount(count + 1)}>{count}</button>;
 }
 ```
+---
+
+## 🔹 React.memo vs useMemo vs useCallback
+
+### 🧠 1. React.memo
+
+**Definition**:  
+`React.memo` is a **Higher-Order Component (HOC)** that prevents a functional component from re-rendering **if its props haven't changed**.
+
+**✅ Use When**:
+- Your component receives props that **don’t change frequently**.
+- Component is **pure** (output depends only on props).
+
+**📦 Example**:
+```jsx
+const MyButton = React.memo(({ label, onClick }) => {
+  console.log("Rendering:", label);
+  return <button onClick={onClick}>{label}</button>;
+});
+```
+
+> With `React.memo`, `MyButton` only re-renders when `label` or `onClick` changes.
+
+---
+
+### 🧠 2. useMemo
+
+**Definition**:  
+`useMemo` is a **hook** that memoizes the **result of a computation**, so the value is **recalculated only when dependencies change**.
+
+**✅ Use When**:
+- The computation is **expensive**.
+- You want to avoid **recalculating the same value** on every render.
+
+**📦 Example**:
+```jsx
+const App = ({ number }) => {
+  const expensiveValue = useMemo(() => {
+    console.log("Calculating...");
+    let result = 0;
+    for (let i = 0; i < 1e6; i++) result += number;
+    return result;
+  }, [number]);
+
+  return <div>Result: {expensiveValue}</div>;
+};
+```
+
+---
+
+### 🧠 3. useCallback
+
+**Definition**:  
+`useCallback` **memoizes a function** definition so that it is not recreated unless its **dependencies change**.
+
+**✅ Use When**:
+- You pass a function to a child component.
+- You want to avoid **unnecessary re-renders** due to new function references.
+
+**📦 Example**:
+```jsx
+const Parent = () => {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    console.log("Clicked");
+  }, []);
+
+  return (
+    <>
+      <Child onClick={handleClick} />
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </>
+  );
+};
+
+const Child = React.memo(({ onClick }) => {
+  console.log("Child rendered");
+  return <button onClick={onClick}>Click Me</button>;
+});
+```
+
+---
+
+### 🔍 Differences Between `React.memo`, `useMemo`, and `useCallback`
+
+| Feature         | `React.memo`                         | `useMemo`                                    | `useCallback`                            |
+|----------------|--------------------------------------|----------------------------------------------|------------------------------------------|
+| Type           | Higher-Order Component (HOC)         | Hook                                         | Hook                                     |
+| Purpose        | Prevent re-render if props unchanged | Cache **computed value**                     | Cache **function reference**             |
+| Used On        | Components                           | Values                                        | Functions                                |
+| Example Use    | `<MyComponent />`                    | `const val = useMemo(() => ..., [deps])`     | `const fn = useCallback(() => ..., [])`  |
+| Common Use Case| Avoid re-rendering child components  | Expensive calculations                       | Stable function references for children  |
