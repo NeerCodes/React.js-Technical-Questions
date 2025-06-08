@@ -53,100 +53,6 @@ const result = useMemo(() => computeExpensiveValue(input), [input]);
 const handleClick = useCallback(() => doSomething(), [dependencies]);
 ```
 
-## 🔹 React.memo vs useMemo vs useCallback
-
-### 🧠 1. React.memo
-
-**Definition**:  
-`React.memo` is a **Higher-Order Component (HOC)** that prevents a functional component from re-rendering **if its props haven't changed**.
-
-**✅ Use When**:
-- Your component receives props that **don’t change frequently**.
-- Component is **pure** (output depends only on props).
-
-**📦 Example**:
-```jsx
-const MyButton = React.memo(({ label, onClick }) => {
-  console.log("Rendering:", label);
-  return <button onClick={onClick}>{label}</button>;
-});
-```
-
-> With `React.memo`, `MyButton` only re-renders when `label` or `onClick` changes.
-
----
-
-### 🧠 2. useMemo
-
-**Definition**:  
-`useMemo` is a **hook** that memoizes the **result of a computation**, so the value is **recalculated only when dependencies change**.
-
-**✅ Use When**:
-- The computation is **expensive**.
-- You want to avoid **recalculating the same value** on every render.
-
-**📦 Example**:
-```jsx
-const App = ({ number }) => {
-  const expensiveValue = useMemo(() => {
-    console.log("Calculating...");
-    let result = 0;
-    for (let i = 0; i < 1e6; i++) result += number;
-    return result;
-  }, [number]);
-
-  return <div>Result: {expensiveValue}</div>;
-};
-```
-
----
-
-### 🧠 3. useCallback
-
-**Definition**:  
-`useCallback` **memoizes a function** definition so that it is not recreated unless its **dependencies change**.
-
-**✅ Use When**:
-- You pass a function to a child component.
-- You want to avoid **unnecessary re-renders** due to new function references.
-
-**📦 Example**:
-```jsx
-const Parent = () => {
-  const [count, setCount] = useState(0);
-
-  const handleClick = useCallback(() => {
-    console.log("Clicked");
-  }, []);
-
-  return (
-    <>
-      <Child onClick={handleClick} />
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </>
-  );
-};
-
-const Child = React.memo(({ onClick }) => {
-  console.log("Child rendered");
-  return <button onClick={onClick}>Click Me</button>;
-});
-```
-
----
-
-### 🔍 Differences Between `React.memo`, `useMemo`, and `useCallback`
-
-| Feature         | `React.memo`                         | `useMemo`                                    | `useCallback`                            |
-|----------------|--------------------------------------|----------------------------------------------|------------------------------------------|
-| Type           | Higher-Order Component (HOC)         | Hook                                         | Hook                                     |
-| Purpose        | Prevent re-render if props unchanged | Cache **computed value**                     | Cache **function reference**             |
-| Used On        | Components                           | Values                                        | Functions                                |
-| Example Use    | `<MyComponent />`                    | `const val = useMemo(() => ..., [deps])`     | `const fn = useCallback(() => ..., [])`  |
-| Common Use Case| Avoid re-rendering child components  | Expensive calculations                       | Stable function references for children  |
-
----
-
 ### 🔹 How does React reconciliation work?
 - React compares new and old virtual DOM using keys to update only changed elements.
 
@@ -219,6 +125,65 @@ const LazyComp = React.lazy(() => import('./MyComponent'));
 - React can pause and resume rendering, improving responsiveness.
 
 ---
+
+
+---
+
+## 🔹 What is a Portal in React?
+
+**Definition**:  
+A **Portal** allows you to render a child into a different part of the **DOM tree**, outside the parent component’s hierarchy.
+
+### 📌 Use Case:
+- Modals
+- Tooltips
+- Dropdowns  
+> Useful when you want content to **escape overflow or z-index** boundaries of parent containers.
+
+### 🔹 Syntax:
+```jsx
+import ReactDOM from 'react-dom';
+
+ReactDOM.createPortal(child, container);
+```
+
+### 🔸 Example: Modal using Portal
+
+**index.html**
+```html
+<body>
+  <div id="root"></div>
+  <div id="modal-root"></div> <!-- Portal target -->
+</body>
+```
+
+**Modal.js**
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const Modal = ({ children }) => {
+  return ReactDOM.createPortal(
+    <div className="modal">{children}</div>,
+    document.getElementById('modal-root')
+  );
+};
+
+export default Modal;
+```
+
+**App.js**
+```jsx
+<Modal>
+  <h2>This is rendered in a portal!</h2>
+</Modal>
+```
+
+### 🧠 Why is this useful in interviews?
+- Shows understanding of **DOM hierarchy manipulation**
+- Portals maintain **React event bubbling** even when rendered outside the parent DOM node
+- Commonly used for **modals, toasts, popovers**
+
 
 ## 5. React with Tools
 
@@ -310,3 +275,94 @@ function Counter() {
 ```
 ---
 
+## 🔹 React.memo vs useMemo vs useCallback
+
+### 🧠 1. React.memo
+
+**Definition**:  
+`React.memo` is a **Higher-Order Component (HOC)** that prevents a functional component from re-rendering **if its props haven't changed**.
+
+**✅ Use When**:
+- Your component receives props that **don’t change frequently**.
+- Component is **pure** (output depends only on props).
+
+**📦 Example**:
+```jsx
+const MyButton = React.memo(({ label, onClick }) => {
+  console.log("Rendering:", label);
+  return <button onClick={onClick}>{label}</button>;
+});
+```
+
+> With `React.memo`, `MyButton` only re-renders when `label` or `onClick` changes.
+
+---
+
+### 🧠 2. useMemo
+
+**Definition**:  
+`useMemo` is a **hook** that memoizes the **result of a computation**, so the value is **recalculated only when dependencies change**.
+
+**✅ Use When**:
+- The computation is **expensive**.
+- You want to avoid **recalculating the same value** on every render.
+
+**📦 Example**:
+```jsx
+const App = ({ number }) => {
+  const expensiveValue = useMemo(() => {
+    console.log("Calculating...");
+    let result = 0;
+    for (let i = 0; i < 1e6; i++) result += number;
+    return result;
+  }, [number]);
+
+  return <div>Result: {expensiveValue}</div>;
+};
+```
+
+---
+
+### 🧠 3. useCallback
+
+**Definition**:  
+`useCallback` **memoizes a function** definition so that it is not recreated unless its **dependencies change**.
+
+**✅ Use When**:
+- You pass a function to a child component.
+- You want to avoid **unnecessary re-renders** due to new function references.
+
+**📦 Example**:
+```jsx
+const Parent = () => {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    console.log("Clicked");
+  }, []);
+
+  return (
+    <>
+      <Child onClick={handleClick} />
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </>
+  );
+};
+
+const Child = React.memo(({ onClick }) => {
+  console.log("Child rendered");
+  return <button onClick={onClick}>Click Me</button>;
+});
+```
+
+---
+
+### 🔍 Differences Between `React.memo`, `useMemo`, and `useCallback`
+
+| Feature         | `React.memo`                         | `useMemo`                                    | `useCallback`                            |
+|----------------|--------------------------------------|----------------------------------------------|------------------------------------------|
+| Type           | Higher-Order Component (HOC)         | Hook                                         | Hook                                     |
+| Purpose        | Prevent re-render if props unchanged | Cache **computed value**                     | Cache **function reference**             |
+| Used On        | Components                           | Values                                        | Functions                                |
+| Example Use    | `<MyComponent />`                    | `const val = useMemo(() => ..., [deps])`     | `const fn = useCallback(() => ..., [])`  |
+| Common Use Case| Avoid re-rendering child components  | Expensive calculations                       | Stable function references for children  |
