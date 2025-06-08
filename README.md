@@ -145,6 +145,7 @@ const Child = React.memo(({ onClick }) => {
 | Example Use    | `<MyComponent />`                    | `const val = useMemo(() => ..., [deps])`     | `const fn = useCallback(() => ..., [])`  |
 | Common Use Case| Avoid re-rendering child components  | Expensive calculations                       | Stable function references for children  |
 
+---
 
 ### 🔹 How does React reconciliation work?
 - React compares new and old virtual DOM using keys to update only changed elements.
